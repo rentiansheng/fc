@@ -1,9 +1,10 @@
 package code
 
 import (
-	"github.com/pkg/errors"
 	"go/ast"
 	"go/token"
+
+	"github.com/pkg/errors"
 )
 
 /***************************
@@ -100,6 +101,9 @@ func (cd *CodeDiff) compare() error {
 			}
 		}
 	}
+	// 清理纯struct 定义对代码比较的影响
+	cd.preASTFile(cd.f1)
+	cd.preASTFile(cd.f2)
 	for k, v := range cd.res {
 		v.Same = cd.compareFunc(v.F1, v.F2)
 		cd.res[k] = v
@@ -146,4 +150,19 @@ func (cd *CodeDiff) fileFunction(fSet *token.FileSet, decls []ast.Decl) (map[str
 	}
 
 	return res, nil
+}
+
+func (cd *CodeDiff) preASTFile(f *ast.File) {
+	for _, decl := range f.Decls {
+		switch v := decl.(type) {
+		case *ast.GenDecl:
+			for _, spec := range v.Specs {
+				if typeSpec, ok := spec.(*ast.TypeSpec); ok {
+					if typeSpecStruct, ok := typeSpec.Type.(*ast.StructType); ok {
+						typeSpecStruct.Fields = nil
+					}
+				}
+			}
+		}
+	}
 }

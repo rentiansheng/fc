@@ -1,10 +1,11 @@
 package code
 
 import (
-	"github.com/stretchr/testify/require"
 	"go/parser"
 	"go/token"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 /***************************
@@ -56,14 +57,14 @@ func diff1()  { {var a int; _ = a}}`
 func Test_DiffStruct(t *testing.T) {
 	fileBody1 := `package code
 type  methodFunc struct {}
-func (m methodFunc) same2()  {var a int; _ = a}
-func  same1()  {var a methodFunc; _ = a}
+func (m methodFunc) same1()  {var a int; _ = a}
+func  diff1()  {a := struct{}{}; _ = a}
 `
 
 	fileBody2 := `package code
 type  methodFunc struct {a int}
-func (m methodFunc) same2()  {var a int; _ = a}
-func  same1()  {var a methodFunc; _ = a}
+func (m methodFunc) same1()  {var a int; _ = a}
+func  diff1()  {a := struct{a int}{}; _ = a}
 
 `
 
@@ -77,6 +78,6 @@ func  same1()  {var a methodFunc; _ = a}
 	cd := NewCodeDiff(f1, f2, f1Set, f2Set)
 	_, diffs, err := cd.Diff()
 	require.NoError(t, err)
-	require.Equal(t, 2, len(diffs))
+	require.Equal(t, 1, len(diffs))
 
 }
