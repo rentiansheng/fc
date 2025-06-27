@@ -2,6 +2,7 @@ package code_anaylsis
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"go/types"
 	"golang.org/x/tools/go/ssa"
 )

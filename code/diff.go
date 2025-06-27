@@ -166,3 +166,4 @@ func (cd *CodeDiff) preASTFile(f *ast.File) {
 		}
 	}
 }
+
